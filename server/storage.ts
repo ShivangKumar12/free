@@ -65,15 +65,18 @@ export class MemStorage implements IStorage {
     this.reviews = new Map();
     this.resumes = new Map();
     this.messages = new Map();
+    this.socialLinks = new Map();
     
     this.currentUserId = 1;
     this.currentProjectId = 1;
     this.currentReviewId = 1;
     this.currentResumeId = 1;
     this.currentMessageId = 1;
+    this.currentSocialLinkId = 1;
     
-    // Add sample projects
+    // Add sample projects and seed initial data
     this.seedProjects();
+    this.seedSocialLinks();
   }
 
   // User operations
