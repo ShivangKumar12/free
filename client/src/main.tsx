@@ -19,7 +19,7 @@ fontLinks.forEach((link) => document.head.appendChild(link));
 
 // Add title
 const titleElement = document.createElement("title");
-titleElement.textContent = "3D Portfolio | Freelancer";
+titleElement.textContent = "3D Debian | Freelancer";
 document.head.appendChild(titleElement);
 
 // Render the app

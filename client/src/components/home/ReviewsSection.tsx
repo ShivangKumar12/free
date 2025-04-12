@@ -43,7 +43,7 @@ const ReviewsSection: React.FC = () => {
   });
   
   // Get reviews query
-  const { data: reviews, isLoading, error } = useQuery({
+  const { data: reviews = [], isLoading, error } = useQuery<Review[]>({
     queryKey: ['/api/reviews'],
     staleTime: 60000,
   });
@@ -119,7 +119,7 @@ const ReviewsSection: React.FC = () => {
     }
   ];
   
-  const reviewsToDisplay = reviews || sampleReviews;
+  const reviewsToDisplay: Review[] = reviews.length > 0 ? reviews : sampleReviews;
   
   const getDefaultSlidesToShow = () => {
     if (typeof window === 'undefined') return 1;
@@ -361,16 +361,16 @@ const ReviewsSection: React.FC = () => {
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
                           >
-                            <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50">
+                            <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50 w-full">
                               <SelectValue placeholder="Select rating" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent position="popper" className="w-full min-w-[200px]">
                               <SelectGroup>
-                                <SelectItem value="5">5 Stars - Excellent</SelectItem>
-                                <SelectItem value="4">4 Stars - Very Good</SelectItem>
-                                <SelectItem value="3">3 Stars - Good</SelectItem>
-                                <SelectItem value="2">2 Stars - Fair</SelectItem>
-                                <SelectItem value="1">1 Star - Poor</SelectItem>
+                                <SelectItem value="5" className="cursor-pointer">5 Stars - Excellent</SelectItem>
+                                <SelectItem value="4" className="cursor-pointer">4 Stars - Very Good</SelectItem>
+                                <SelectItem value="3" className="cursor-pointer">3 Stars - Good</SelectItem>
+                                <SelectItem value="2" className="cursor-pointer">2 Stars - Fair</SelectItem>
+                                <SelectItem value="1" className="cursor-pointer">1 Star - Poor</SelectItem>
                               </SelectGroup>
                             </SelectContent>
                           </Select>
@@ -411,16 +411,16 @@ const ReviewsSection: React.FC = () => {
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
                           >
-                            <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50">
+                            <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50 w-full">
                               <SelectValue placeholder="Select project type" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent position="popper" className="w-full min-w-[200px]">
                               <SelectGroup>
-                                <SelectItem value="web">Web Development</SelectItem>
-                                <SelectItem value="app">Mobile App</SelectItem>
-                                <SelectItem value="graphic">Graphic Design</SelectItem>
-                                <SelectItem value="poster">Poster Design</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="web" className="cursor-pointer">Web Development</SelectItem>
+                                <SelectItem value="app" className="cursor-pointer">Mobile App</SelectItem>
+                                <SelectItem value="graphic" className="cursor-pointer">Graphic Design</SelectItem>
+                                <SelectItem value="poster" className="cursor-pointer">Poster Design</SelectItem>
+                                <SelectItem value="other" className="cursor-pointer">Other</SelectItem>
                               </SelectGroup>
                             </SelectContent>
                           </Select>
