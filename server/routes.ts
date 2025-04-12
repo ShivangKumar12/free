@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertReviewSchema, insertResumeSchema, insertMessageSchema } from "@shared/schema";
+import { insertReviewSchema, insertResumeSchema, insertMessageSchema, insertProjectSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -61,6 +61,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedProject);
     } catch (error) {
       res.status(500).json({ message: "Failed to update project" });
+    }
+  });
+  
+  // Create new project
+  app.post("/api/projects", async (req, res) => {
+    try {
+      const projectData = insertProjectSchema.parse(req.body);
+      const newProject = await storage.createProject(projectData);
+      res.status(201).json(newProject);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid project data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create project" });
+      }
     }
   });
   
