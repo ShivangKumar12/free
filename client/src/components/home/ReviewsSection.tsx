@@ -364,7 +364,7 @@ const ReviewsSection: React.FC = () => {
                             <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50 w-full">
                               <SelectValue placeholder="Select rating" />
                             </SelectTrigger>
-                            <SelectContent position="popper" className="w-full min-w-[200px]">
+                            <SelectContent position="popper" className="min-w-[200px]" sideOffset={5}>
                               <SelectGroup>
                                 <SelectItem value="5" className="cursor-pointer">5 Stars - Excellent</SelectItem>
                                 <SelectItem value="4" className="cursor-pointer">4 Stars - Very Good</SelectItem>
@@ -414,7 +414,7 @@ const ReviewsSection: React.FC = () => {
                             <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50 w-full">
                               <SelectValue placeholder="Select project type" />
                             </SelectTrigger>
-                            <SelectContent position="popper" className="w-full min-w-[200px]">
+                            <SelectContent position="popper" className="min-w-[200px]" sideOffset={5}>
                               <SelectGroup>
                                 <SelectItem value="web" className="cursor-pointer">Web Development</SelectItem>
                                 <SelectItem value="app" className="cursor-pointer">Mobile App</SelectItem>
