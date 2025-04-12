@@ -1,6 +1,9 @@
 import express from 'express';
 import serverless from 'serverless-http';
-import { storage } from '../dist/storage.js';
+import { MemStorage } from '../server/storage.js';
+
+// Initialize memory storage
+const storage = new MemStorage();
 
 const app = express();
 const router = express.Router();
@@ -8,9 +11,22 @@ const router = express.Router();
 // Middleware
 app.use(express.json());
 
-// Enable CORS
+// Enable CORS with stricter settings for production
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  // In production, restrict to your domain
+  const allowedOrigins = [
+    'https://shivang-portfolio.netlify.app', 
+    'https://www.shivang-portfolio.netlify.app'
+  ];
+  
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    // For local development or unknown origins
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+  
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
@@ -139,7 +155,31 @@ router.post('/messages', async (req, res) => {
   }
 });
 
+// Social links routes
+router.get('/social-links', async (req, res) => {
+  try {
+    const links = await storage.getSocialLinks();
+    res.json(links);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch('/social-links', async (req, res) => {
+  try {
+    const links = await storage.updateSocialLinks(req.body);
+    res.json(links);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use('/api', router);
+
+// Health check route
+app.get('/.netlify/functions/server/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Handle errors
 app.use((err, req, res, next) => {

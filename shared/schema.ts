@@ -53,11 +53,10 @@ export const messages = pgTable("messages", {
 
 export const socialLinks = pgTable("social_links", {
   id: serial("id").primaryKey(),
-  github: text("github").notNull(),
-  linkedin: text("linkedin").notNull(),
-  twitter: text("twitter").notNull(),
-  facebook: text("facebook").notNull(),
-  instagram: text("instagram").notNull(),
+  github: text("github").notNull(), // https://github.com/ShivangKumar12
+  linkedin: text("linkedin").notNull(), // https://www.linkedin.com/in/shivang-kumar98/
+  facebook: text("facebook").notNull(), // https://www.facebook.com/shivangsharma9852
+  instagram: text("instagram").notNull(), // https://www.instagram.com/shivang__18.12
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

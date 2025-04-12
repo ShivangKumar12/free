@@ -582,7 +582,13 @@ const Admin: React.FC = () => {
                                   <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent position="popper" className="min-w-[200px]" sideOffset={5}>
+                              <SelectContent 
+                              position="popper" 
+                              className="min-w-[200px] max-h-[300px] overflow-y-auto z-50" 
+                              sideOffset={5}
+                              align="start"
+                              avoidCollisions={true}
+                            >
                                 <SelectItem value="web">Web Development</SelectItem>
                                 <SelectItem value="app">Mobile App</SelectItem>
                                 <SelectItem value="graphic">Graphic Design</SelectItem>
