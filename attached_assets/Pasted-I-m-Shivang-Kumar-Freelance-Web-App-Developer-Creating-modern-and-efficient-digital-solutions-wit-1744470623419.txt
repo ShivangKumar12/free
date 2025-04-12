@@ -1,0 +1,177 @@
+I'm Shivang Kumar
+Freelance Web & App Developer
+
+Creating modern and efficient digital solutions with a strong focus on backend logic, responsive design, and clean architecture. I specialize in web applications, Android development, and backend engineering to support smart, secure, and scalable platforms.
+
+🔧 Full-Stack Engineer | Backend Specialist | Firebase & React Developer
+
+[View My Work] | [Contact Me]
+
+👨‍💻 2+ Years Experience
+🚀 Academic Projects & Internships
+💡 B.Tech (CSE) @ Chandigarh Engineering College
+
+🚀 My Projects
+Explore my growing portfolio featuring web applications, mobile solutions, and creative software systems.
+
+All Projects
+[Web] [Mobile App] [Graphic Design] [Poster]
+
+🅿️ Parking Management System
+Web Development | React, Express, MongoDB
+Developed a real-time smart parking system for digital vehicle slot management and tracking. Created responsive frontend in React.js and connected it with Express.js and MongoDB for efficient backend data flow.
+
+[Live Demo] [View Code]
+
+🧤 Hand Gesture Recognition (BTech Project)
+ML-Integrated App Concept
+An experimental project exploring computer vision and gesture inputs for automation and accessibility use-cases.
+
+[Coming Soon]
+
+🖥️ College Website Backend (Internship)
+Node.js | Express | Firebase | MongoDB
+As a web development intern, I helped develop and maintain the backend of the college website, improving data flow, authentication, and integration with frontend modules.
+
+[Certificate Available] [View Summary]
+
+🧠 My Skills
+Specialized in modern development tools and frameworks with a passion for scalable architecture and clean UX.
+
+Web Development
+React / Next.js: 90%
+
+Node.js / Express.js: 88%
+
+Firebase: 88%
+
+MongoDB / MySQL: 85%
+
+App Development
+React Native: 82%
+
+Java (Android): 75%
+
+Kotlin (Learning)
+
+Backend Engineering
+REST APIs, Auth Systems
+
+Firebase Functions, MongoDB Atlas
+
+PHP (Legacy Support)
+
+Design & Soft Tools
+Figma (UI Prototyping)
+
+Photoshop / Canva (Posters, Graphics)
+
+Version Control: Git, GitHub
+
+📄 Download Resume
+[Download PDF]
+
+⭐ Client Reviews
+See what collaborators and users say about my work and professionalism.
+
+🚧 New to freelancing! This section will soon feature real client testimonials as I begin working on more projects.
+
+💬 Leave Your Review
+Full Name
+Your name
+
+Email Address
+Your email
+
+Company (Optional)
+Your company
+
+Rating
+★ ★ ★ ★ ★
+
+Your Review
+Share your experience working with me…
+
+Project Type
+Select project type
+
+[Submit Review]
+
+📤 Submit Resume
+Looking to collaborate? Share your resume and project brief to get started.
+
+Full Name
+Email Address
+Project Brief
+Describe your project, requirements, timeline, and budget…
+
+Project Category
+[Web | Mobile | Design | Other]
+
+Budget Range
+Select budget range
+
+Upload Resume (PDF or DOCX)
+📁 Drag & drop your resume here or click to browse
+(Max 5MB)
+
+[Submit Application]
+
+📞 Get In Touch
+Full Name
+Your name
+
+Email Address
+Your email
+
+Subject
+Message subject
+
+Message
+Your message
+
+[Send Message]
+
+📍 Contact Information
+Email
+shivangkumarcgc@gmail.com
+
+Phone
++91 – 9852001237
+
+Location
+Landran, Mohali, Punjab – 140307
+
+🕘 Working Hours
+Monday - Friday: 10am – 6pm
+Saturday: 11am – 2pm
+Sunday: Closed
+
+🔗 Quick Links
+Home
+
+Projects
+
+Skills
+
+Reviews
+
+Submit Resume
+
+Contact
+
+🛠️ Services
+Web Development
+
+Mobile App Development
+
+UI/UX Design
+
+Backend Systems
+
+Firebase Projects
+
+📬 Subscribe for Updates
+[Your Email Here] [Subscribe]
+
+Would you like me to turn this into a working React + Tailwind + Firebase project structure next?

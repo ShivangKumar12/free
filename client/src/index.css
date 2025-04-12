@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+  }
+}
+  
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom Animation */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fonts */
+.font-space {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 15, 15, 0.9);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 114, 224, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 114, 224, 0.8);
+}
+
+/* Star animation */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.star {
+  animation: twinkle 4s ease-in-out infinite;
+  animation-delay: calc(var(--delay) * 1s);
+}
+
+/* 3D Card Effect */
+.card3d {
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  transform: perspective(1000px) rotateX(0) rotateY(0);
+  transform-style: preserve-3d;
+}
+
+.card3d:hover {
+  box-shadow: 0 10px 30px -10px rgba(56, 114, 224, 0.5);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #3872e0 0%, #5d9bff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(56, 114, 224, 0.1);
+}
+
+/* Responsive padding for sections */
+.section-padding {
+  @apply py-16 md:py-24 lg:py-32;
+}
+
+/* Skills progress animation */
+@keyframes progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+.skill-progress {
+  animation: progress 1.5s ease-out forwards;
+}
+
+/* Floating effect */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Project tags */
+.project-tag {
+  @apply inline-block px-2 py-1 text-xs bg-primary/20 text-primary rounded-full mr-2 mb-2;
+}
+
+/* Contact form styles */
+.contact-input {
+  @apply w-full bg-background/70 border border-primary/20 rounded-lg px-4 py-3 
+  focus:outline-none focus:border-primary/50 transition-colors;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .section-title {
+    @apply text-2xl md:text-3xl;
+  }
+}
