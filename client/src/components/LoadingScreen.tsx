@@ -6,21 +6,39 @@ interface LoadingScreenProps {
   profileImage: string;
 }
 
+const loadingMessages = [
+  "Initializing modules...",
+  "Fetching portfolio data...",
+  "Loading 3D assets...",
+  "Connecting to Firebase...",
+  "Optimizing shaders...",
+  "Compiling components...",
+  "Verifying user session...",
+  "Setting up interface...",
+  "Syncing animations...",
+  "Finalizing layout...",
+];
+
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileImage }) => {
   const [progress, setProgress] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
+        const next = prevProgress + Math.random() * 10;
+        if (next >= 100) {
           clearInterval(interval);
           setTimeout(() => {
             onLoadComplete();
-          }, 1500); // Delay to show the 100% before completing
+          }, 1500); // Pause to show 100%
           return 100;
         }
-        return prevProgress + Math.random() * 10;
+        return Math.min(next, 100);
       });
+
+      // Rotate message
+      setMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
     }, 200);
 
     return () => clearInterval(interval);
@@ -30,7 +48,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileIm
     <motion.div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background"
       initial={{ opacity: 1 }}
-      animate={progress >= 100 ? { opacity: 0 } : { opacity: 1 }}
+      animate={Math.floor(progress) >= 100 ? { opacity: 0 } : { opacity: 1 }}
       transition={{ duration: 1, ease: "easeInOut" }}
     >
       <motion.div 
@@ -55,14 +73,15 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileIm
       </motion.div>
 
       <motion.h1 
-        className="mb-8 text-4xl font-bold text-center font-orbitron"
+        className="mb-6 text-4xl font-bold text-center font-orbitron"
         animate={{ 
           y: progress >= 100 ? -20 : 0,
           scale: progress >= 100 ? 1.2 : 1
         }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <span className="text-primary">PORTFOLIO</span>
+  <span className="text-4xl font-orbitron font-bold">DEB<span className="text-primary">IAN</span></span>
+
       </motion.h1>
 
       <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mb-2">
@@ -74,11 +93,18 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileIm
         />
       </div>
 
-      <motion.p 
-        className="text-gray-400"
-        animate={{ opacity: progress >= 100 ? 0 : 1 }}
-      >
+      <motion.p className="text-gray-400 mb-1">
         {Math.round(progress)}%
+      </motion.p>
+
+      <motion.p
+        key={messageIndex}
+        className="text-sm text-gray-500 font-mono text-center"
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {loadingMessages[messageIndex]}
       </motion.p>
 
       {progress >= 100 && (
