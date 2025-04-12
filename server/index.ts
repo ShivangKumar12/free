@@ -43,8 +43,18 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    console.error("Server error:", err);
+    
+    res.status(status).json({ 
+      message,
+      details: app.get("env") === "development" ? (err.details || err.stack) : undefined
+    });
+    
+    // Don't throw the error further as it will crash the server
+    // Just log it
+    if (!res.headersSent) {
+      res.status(500).json({ message: "An unexpected error occurred" });
+    }
   });
 
   // importantly only setup vite in development and after
