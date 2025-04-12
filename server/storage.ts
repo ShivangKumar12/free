@@ -3,7 +3,8 @@ import {
   projects, type Project, type InsertProject,
   reviews, type Review, type InsertReview,
   resumes, type Resume, type InsertResume,
-  messages, type Message, type InsertMessage
+  messages, type Message, type InsertMessage,
+  socialLinks, type SocialLink, type InsertSocialLink
 } from "@shared/schema";
 
 // modify the interface with any CRUD methods
@@ -37,6 +38,10 @@ export interface IStorage {
   // Message operations
   getAllMessages(): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+  
+  // Social Links operations
+  getSocialLinks(): Promise<SocialLink | undefined>;
+  updateSocialLinks(links: InsertSocialLink): Promise<SocialLink>;
 }
 
 export class MemStorage implements IStorage {
@@ -45,12 +50,14 @@ export class MemStorage implements IStorage {
   private reviews: Map<number, Review>;
   private resumes: Map<number, Resume>;
   private messages: Map<number, Message>;
+  private socialLinks: Map<number, SocialLink>;
   
   currentUserId: number;
   currentProjectId: number;
   currentReviewId: number;
   currentResumeId: number;
   currentMessageId: number;
+  currentSocialLinkId: number;
 
   constructor() {
     this.users = new Map();
