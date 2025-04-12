@@ -213,6 +213,23 @@ export class MemStorage implements IStorage {
     return message;
   }
   
+  // Social Links operations
+  async getSocialLinks(): Promise<SocialLink | undefined> {
+    // Return the first social link entry (we only maintain one)
+    if (this.socialLinks.size > 0) {
+      return Array.from(this.socialLinks.values())[0];
+    }
+    return undefined;
+  }
+  
+  async updateSocialLinks(links: InsertSocialLink): Promise<SocialLink> {
+    const id = 1; // Always use ID 1 for social links as we only maintain one set
+    const updatedAt = new Date();
+    const socialLink: SocialLink = { ...links, id, updatedAt };
+    this.socialLinks.set(id, socialLink);
+    return socialLink;
+  }
+  
   // Seed sample projects data
   private seedProjects() {
     const sampleProjects: InsertProject[] = [
@@ -292,6 +309,19 @@ export class MemStorage implements IStorage {
       const newReview = await this.createReview(review);
       await this.approveReview(newReview.id);
     });
+  }
+  
+  private seedSocialLinks() {
+    // Create initial social links
+    const socialLinksData: InsertSocialLink = {
+      github: 'https://github.com/3d-debian',
+      linkedin: 'https://linkedin.com/in/3d-debian',
+      twitter: 'https://twitter.com/3d-debian',
+      instagram: 'https://instagram.com/3d-debian',
+      facebook: ''
+    };
+    
+    this.updateSocialLinks(socialLinksData);
   }
 }
 
