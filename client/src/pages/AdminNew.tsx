@@ -1,0 +1,939 @@
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { getAuth, signInWithEmailAndPassword, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { Project, Review } from '@/types/schema';
+
+const LoginSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" })
+});
+
+const ProjectSchema = z.object({
+  title: z.string().min(2, { message: "Title must be at least 2 characters" }),
+  description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+  category: z.string().min(1, { message: "Please select a category" }),
+  imageUrl: z.string().url({ message: "Please enter a valid image URL" }),
+  tags: z.union([
+    z.string().transform(val => val.split(',').map(tag => tag.trim())),
+    z.array(z.string())
+  ]),
+  liveUrl: z.union([
+    z.string().url({ message: "Please enter a valid URL" }),
+    z.string().length(0),
+    z.undefined()
+  ]),
+  codeUrl: z.union([
+    z.string().url({ message: "Please enter a valid URL" }),
+    z.string().length(0), 
+    z.undefined()
+  ]),
+});
+
+const ContactInfoSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  location: z.string().min(3, { message: "Please enter a valid location" }),
+});
+
+const PasswordChangeSchema = z.object({
+  currentPassword: z.string().min(6, { message: "Current password is required" }),
+  newPassword: z.string().min(6, { message: "New password must be at least 6 characters" }),
+  confirmPassword: z.string().min(6, { message: "Confirm password must be at least 6 characters" }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+const Admin: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const { toast } = useToast();
+  const auth = getAuth();
+  const queryClient = useQueryClient();
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsAuthenticated(!!user);
+    });
+    
+    return () => unsubscribe();
+  }, [auth]);
+  
+  // Login Form
+  const loginForm = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+  
+  // Password Change Form
+  const passwordForm = useForm<z.infer<typeof PasswordChangeSchema>>({
+    resolver: zodResolver(PasswordChangeSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+  
+  // Contact Info Form
+  const contactInfoForm = useForm({
+    defaultValues: {
+      email: "shivangkumarcgc@gmail.com",
+      phone: "+91 – 9852001237",
+      location: "Landran, Mohali, Punjab – 140307",
+    },
+  });
+  
+  const handleLogin = async (values: z.infer<typeof LoginSchema>) => {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      toast({
+        title: "Login Successful",
+        description: "You are now logged in to the admin panel.",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: "Invalid email or password. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while logging out.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handlePasswordChange = async (values: z.infer<typeof PasswordChangeSchema>) => {
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        throw new Error("User not found or not logged in");
+      }
+      
+      // Re-authenticate the user
+      const credential = EmailAuthProvider.credential(user.email, values.currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      
+      // Update password
+      await updatePassword(user, values.newPassword);
+      
+      toast({
+        title: "Password Updated",
+        description: "Your password has been updated successfully.",
+        variant: "default",
+      });
+      
+      passwordForm.reset();
+    } catch (error: any) {
+      let errorMessage = "An error occurred while updating the password.";
+      
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = "The current password is incorrect.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "The new password is too weak.";
+      }
+      
+      toast({
+        title: "Password Update Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleContactInfoUpdate = (data: any) => {
+    // Here you would normally save this to a database
+    // For demo purposes, we'll just show a success message
+    toast({
+      title: "Contact Information Updated",
+      description: "Your contact information has been updated successfully.",
+      variant: "default",
+    });
+  };
+  
+  // Project Form
+  const projectForm = useForm<z.infer<typeof ProjectSchema>>({
+    resolver: zodResolver(ProjectSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      imageUrl: "",
+      tags: [] as string[],
+      liveUrl: "",
+      codeUrl: "",
+    },
+  });
+  
+  // Fetch projects
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<Project[]>({
+    queryKey: ['/api/projects'],
+    staleTime: 10000,
+    enabled: isAuthenticated,
+  });
+  
+  // Fetch reviews
+  const { data: reviews = [], isLoading: isLoadingReviews } = useQuery<Review[]>({
+    queryKey: ['/api/reviews'],
+    staleTime: 10000,
+    enabled: isAuthenticated,
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/reviews?admin=true');
+      return response.json();
+    },
+  });
+  
+  // Create/Update project mutation
+  const projectMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const endpoint = selectedProjectId ? `/api/projects/${selectedProjectId}` : '/api/projects';
+      const method = selectedProjectId ? 'PATCH' : 'POST';
+      
+      const formattedData = {
+        ...data,
+        liveUrl: data.liveUrl && data.liveUrl.length > 0 ? data.liveUrl : '',
+        codeUrl: data.codeUrl && data.codeUrl.length > 0 ? data.codeUrl : '',
+      };
+      
+      const response = await apiRequest(method, endpoint, formattedData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      projectForm.reset();
+      setSelectedProjectId(null);
+      toast({
+        title: selectedProjectId ? "Project Updated" : "Project Created",
+        description: `Project has been ${selectedProjectId ? "updated" : "created"} successfully.`,
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || `Failed to ${selectedProjectId ? "update" : "create"} project.`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Delete project mutation
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('DELETE', `/api/projects/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      toast({
+        title: "Project Deleted",
+        description: "Project has been deleted successfully.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete project.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Approve review mutation
+  const approveReviewMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('PATCH', `/api/reviews/${id}/approve`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
+      toast({
+        title: "Review Approved",
+        description: "Review has been approved successfully.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to approve review.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Delete review mutation
+  const deleteReviewMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('DELETE', `/api/reviews/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/reviews'] });
+      toast({
+        title: "Review Deleted",
+        description: "Review has been deleted successfully.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete review.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleProjectSubmit = (data: z.infer<typeof ProjectSchema>) => {
+    projectMutation.mutate(data);
+  };
+  
+  const handleEditProject = (project: Project) => {
+    setSelectedProjectId(project.id);
+    projectForm.reset({
+      title: project.title,
+      description: project.description,
+      category: project.category,
+      imageUrl: project.imageUrl,
+      tags: Array.isArray(project.tags) ? project.tags : [],
+      liveUrl: project.liveUrl || '',
+      codeUrl: project.codeUrl || '',
+    });
+  };
+  
+  const handleCancelEdit = () => {
+    setSelectedProjectId(null);
+    projectForm.reset();
+  };
+  
+  const handleDeleteProject = (id: number) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      deleteProjectMutation.mutate(id);
+    }
+  };
+  
+  const handleApproveReview = (id: number) => {
+    approveReviewMutation.mutate(id);
+  };
+  
+  const handleDeleteReview = (id: number) => {
+    if (window.confirm('Are you sure you want to delete this review?')) {
+      deleteReviewMutation.mutate(id);
+    }
+  };
+  
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-bold text-white">Admin Panel</h2>
+            <p className="mt-2 text-center text-sm text-gray-400">
+              Please sign in to access the admin panel.
+            </p>
+          </div>
+          
+          <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+            <CardHeader>
+              <CardTitle>Login</CardTitle>
+              <CardDescription>Enter your credentials to access the admin panel.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="your@email.com" 
+                            {...field} 
+                            className="bg-background/70 border border-primary/20"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password" 
+                            placeholder="******" 
+                            {...field} 
+                            className="bg-background/70 border border-primary/20"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={loginForm.formState.isSubmitting}
+                  >
+                    {loginForm.formState.isSubmitting ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white">Admin Panel</h1>
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-400">Welcome, Admin</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
+        
+        <Tabs defaultValue="projects" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+          
+          {/* Projects Tab */}
+          <TabsContent value="projects">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Project Form */}
+              <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+                <CardHeader>
+                  <CardTitle>{selectedProjectId ? 'Edit Project' : 'Add New Project'}</CardTitle>
+                  <CardDescription>
+                    {selectedProjectId 
+                      ? 'Update the details of an existing project.' 
+                      : 'Fill in the details to add a new project to your portfolio.'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...projectForm}>
+                    <form onSubmit={projectForm.handleSubmit(handleProjectSubmit)} className="space-y-4">
+                      <FormField
+                        control={projectForm.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Title</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="Project Title" 
+                                {...field} 
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={projectForm.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Project Description" 
+                                {...field} 
+                                className="bg-background/70 border border-primary/20"
+                                rows={4}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={projectForm.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <Select 
+                              onValueChange={field.onChange} 
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="bg-background/70 border border-primary/20">
+                                  <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="web">Web Development</SelectItem>
+                                <SelectItem value="app">Mobile App</SelectItem>
+                                <SelectItem value="graphic">Graphic Design</SelectItem>
+                                <SelectItem value="poster">Poster Design</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={projectForm.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Image URL</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://example.com/image.jpg" 
+                                {...field} 
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={projectForm.control}
+                        name="tags"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tags</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="React, TypeScript, Tailwind" 
+                                value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                                onChange={(e) => {
+                                  const tagsString = e.target.value;
+                                  field.onChange(tagsString ? tagsString.split(',').map(tag => tag.trim()) : []);
+                                }}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={projectForm.control}
+                        name="liveUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Live URL (Optional)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://example.com" 
+                                {...field} 
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={projectForm.control}
+                        name="codeUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Code URL (Optional)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://github.com/yourusername/repo" 
+                                {...field} 
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="flex justify-end space-x-2 pt-4">
+                        {selectedProjectId && (
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={handleCancelEdit}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                        <Button 
+                          type="submit"
+                          disabled={projectMutation.isPending}
+                        >
+                          {projectMutation.isPending 
+                            ? (selectedProjectId ? "Updating..." : "Creating...") 
+                            : (selectedProjectId ? "Update Project" : "Add Project")}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+              
+              {/* Projects List */}
+              <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+                <CardHeader>
+                  <CardTitle>Projects List</CardTitle>
+                  <CardDescription>View and manage your portfolio projects.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoadingProjects ? (
+                    <div className="py-8 text-center text-gray-400">Loading projects...</div>
+                  ) : projects.length === 0 ? (
+                    <div className="py-8 text-center text-gray-400">No projects found. Create your first project.</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {projects.map((project) => (
+                        <div 
+                          key={project.id} 
+                          className="p-4 rounded-lg bg-background/70 border border-primary/10 flex items-start justify-between"
+                        >
+                          <div className="flex items-start space-x-3">
+                            <div className="w-12 h-12 rounded overflow-hidden bg-gray-700 flex-shrink-0">
+                              {project.imageUrl && (
+                                <img 
+                                  src={project.imageUrl} 
+                                  alt={project.title} 
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-white">{project.title}</h4>
+                              <div className="text-xs text-gray-400 mt-1">
+                                <span className="inline-block px-2 py-1 rounded-full bg-primary/10 text-primary mr-2">
+                                  {project.category}
+                                </span>
+                                {Array.isArray(project.tags) && project.tags.slice(0, 3).map((tag, index) => (
+                                  <span key={index} className="inline-block px-2 py-1 rounded-full bg-gray-800 text-gray-300 mr-1">
+                                    {tag}
+                                  </span>
+                                ))}
+                                {Array.isArray(project.tags) && project.tags.length > 3 && (
+                                  <span className="inline-block px-2 py-1 rounded-full bg-gray-800 text-gray-300">
+                                    +{project.tags.length - 3}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleEditProject(project)}
+                            >
+                              Edit
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive"
+                              onClick={() => handleDeleteProject(project.id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          {/* Reviews Tab */}
+          <TabsContent value="reviews">
+            <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+              <CardHeader>
+                <CardTitle>Reviews Management</CardTitle>
+                <CardDescription>Approve or delete submitted reviews.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingReviews ? (
+                  <div className="py-8 text-center text-gray-400">Loading reviews...</div>
+                ) : reviews.length === 0 ? (
+                  <div className="py-8 text-center text-gray-400">No reviews submitted yet.</div>
+                ) : (
+                  <div className="space-y-6">
+                    {reviews.map((review) => (
+                      <div 
+                        key={review.id} 
+                        className={`p-6 rounded-lg ${review.approved ? 'bg-success/10 border-success/20' : 'bg-background/70 border-primary/10'} border flex flex-col md:flex-row md:items-center justify-between`}
+                      >
+                        <div className="mb-4 md:mb-0">
+                          <div className="flex items-center mb-2">
+                            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3 border border-primary/30">
+                              <span className="text-lg font-bold text-primary">{review.name.charAt(0)}</span>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-white">{review.name}</h4>
+                              <div className="flex text-primary">
+                                {Array(review.rating).fill(0).map((_, index) => (
+                                  <svg 
+                                    key={index} 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    className="h-4 w-4" 
+                                    viewBox="0 0 20 20" 
+                                    fill="currentColor"
+                                  >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-gray-300">{review.comment}</p>
+                          <div className="mt-2 text-xs text-gray-400">
+                            <span className="inline-block px-2 py-1 rounded-full bg-primary/10 text-primary mr-2">
+                              {review.projectType}
+                            </span>
+                            <span>
+                              {new Date(review.createdAt).toLocaleDateString()}
+                            </span>
+                            {review.approved && (
+                              <span className="ml-2 text-green-400">Approved</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          {!review.approved && (
+                            <Button 
+                              size="sm" 
+                              onClick={() => handleApproveReview(review.id)}
+                            >
+                              Approve
+                            </Button>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="destructive" 
+                            onClick={() => handleDeleteReview(review.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Settings Tab */}
+          <TabsContent value="settings">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                  <CardDescription>Update your contact information displayed on the website.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...contactInfoForm}>
+                    <form onSubmit={contactInfoForm.handleSubmit(handleContactInfoUpdate)} className="space-y-4">
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="your@email.com" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="+1 (234) 567-890" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Location</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="City, Country" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="pt-4">
+                        <Button type="submit">Update Information</Button>
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+                <CardHeader>
+                  <CardTitle>Change Password</CardTitle>
+                  <CardDescription>Update your account password.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...passwordForm}>
+                    <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="space-y-4">
+                      <FormField
+                        control={passwordForm.control}
+                        name="currentPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Current Password</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="password"
+                                placeholder="••••••••" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={passwordForm.control}
+                        name="newPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>New Password</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="password"
+                                placeholder="••••••••" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={passwordForm.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm New Password</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="password"
+                                placeholder="••••••••" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="pt-4">
+                        <Button type="submit">
+                          Change Password
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
