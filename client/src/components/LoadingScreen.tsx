@@ -34,7 +34,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileIm
       transition={{ duration: 1, ease: "easeInOut" }}
     >
       <motion.div 
-        className="relative w-48 h-48 mb-12 overflow-hidden rounded-full"
+        className="relative w-48 h-48 mb-12 overflow-hidden rounded-full flex items-center justify-center"
         animate={{
           rotateY: progress >= 100 ? 360 : 0,
           scale: progress >= 100 ? 0.8 : 1,
@@ -50,7 +50,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileIm
         <img 
           src={profileImage} 
           alt="Shivang Kumar" 
-          className="absolute inset-2 object-cover rounded-full"
+          className="absolute inset-0 w-full h-full object-cover rounded-full"
         />
       </motion.div>
 
@@ -62,7 +62,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadComplete, profileIm
         }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        DEB<span className="text-primary">IAN</span>
+        <span className="text-primary">PORTFOLIO</span>
       </motion.h1>
 
       <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mb-2">
