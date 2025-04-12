@@ -55,6 +55,7 @@ export const socialLinks = pgTable("social_links", {
   id: serial("id").primaryKey(),
   github: text("github").notNull(),
   linkedin: text("linkedin").notNull(),
+  twitter: text("twitter").notNull(),
   facebook: text("facebook").notNull(),
   instagram: text("instagram").notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
