@@ -219,14 +219,33 @@ const Admin: React.FC = () => {
       const endpoint = selectedProjectId ? `/api/projects/${selectedProjectId}` : '/api/projects';
       const method = selectedProjectId ? 'PATCH' : 'POST';
       
-      const formattedData = {
-        ...data,
-        liveUrl: data.liveUrl && data.liveUrl.length > 0 ? data.liveUrl : '',
-        codeUrl: data.codeUrl && data.codeUrl.length > 0 ? data.codeUrl : '',
-      };
-      
-      const response = await apiRequest(method, endpoint, formattedData);
-      return response.json();
+      try {
+        // Ensure tags is an array of strings
+        let tags = data.tags;
+        if (typeof tags === 'string') {
+          tags = tags.split(',').map((tag: string) => tag.trim());
+        } else if (!Array.isArray(tags)) {
+          tags = [];
+        }
+        
+        // Make a deep copy of the data to avoid mutation issues
+        const formattedData = {
+          title: data.title,
+          description: data.description,
+          category: data.category,
+          imageUrl: data.imageUrl,
+          tags: tags,
+          liveUrl: data.liveUrl && data.liveUrl.length > 0 ? data.liveUrl : '',
+          codeUrl: data.codeUrl && data.codeUrl.length > 0 ? data.codeUrl : '',
+        };
+        
+        console.log('Submitting project data:', formattedData);
+        const response = await apiRequest(method, endpoint, formattedData);
+        return response.json();
+      } catch (error) {
+        console.error('Project mutation error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });

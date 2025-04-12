@@ -52,7 +52,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/projects/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const updatedProject = await storage.updateProject(id, req.body);
+      
+      // Validate the project data
+      const projectData = insertProjectSchema.parse(req.body);
+      
+      // Ensure tags is an array of strings
+      if (projectData.tags) {
+        if (!Array.isArray(projectData.tags)) {
+          if (typeof projectData.tags === 'string') {
+            const tagsString = projectData.tags as string;
+            projectData.tags = tagsString.split(',').map((tag: string) => tag.trim());
+          } else {
+            projectData.tags = [];
+          }
+        }
+      } else {
+        projectData.tags = [];
+      }
+      
+      const updatedProject = await storage.updateProject(id, projectData);
       
       if (!updatedProject) {
         return res.status(404).json({ message: "Project not found" });
@@ -60,7 +78,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(updatedProject);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update project" });
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid project data", errors: error.errors });
+      } else {
+        console.error("Project update error:", error);
+        res.status(500).json({ message: "Failed to update project" });
+      }
     }
   });
   
@@ -68,12 +91,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/projects", async (req, res) => {
     try {
       const projectData = insertProjectSchema.parse(req.body);
+      
+      // Ensure tags is an array of strings
+      if (projectData.tags) {
+        if (!Array.isArray(projectData.tags)) {
+          if (typeof projectData.tags === 'string') {
+            const tagsString = projectData.tags as string;
+            projectData.tags = tagsString.split(',').map((tag: string) => tag.trim());
+          } else {
+            projectData.tags = [];
+          }
+        }
+      } else {
+        projectData.tags = [];
+      }
+      
       const newProject = await storage.createProject(projectData);
       res.status(201).json(newProject);
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Invalid project data", errors: error.errors });
       } else {
+        console.error("Project creation error:", error);
         res.status(500).json({ message: "Failed to create project" });
       }
     }
