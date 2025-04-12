@@ -302,7 +302,13 @@ const ResumeUploadSection: React.FC = () => {
                             <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50">
                               <SelectValue placeholder="Select category" />
                             </SelectTrigger>
-                            <SelectContent position="popper" className="min-w-[200px]" sideOffset={5}>
+                            <SelectContent 
+                              position="popper" 
+                              className="min-w-[200px] max-h-[300px] overflow-y-auto z-50" 
+                              sideOffset={5}
+                              align="start"
+                              avoidCollisions={true}
+                            >
                               <SelectGroup>
                                 <SelectItem value="web">Web Development</SelectItem>
                                 <SelectItem value="app">Mobile App</SelectItem>
@@ -332,7 +338,13 @@ const ResumeUploadSection: React.FC = () => {
                             <SelectTrigger className="bg-background/70 border border-primary/20 focus:border-primary/50">
                               <SelectValue placeholder="Select budget range" />
                             </SelectTrigger>
-                            <SelectContent position="popper" className="min-w-[200px]" sideOffset={5}>
+                            <SelectContent 
+                              position="popper" 
+                              className="min-w-[200px] max-h-[300px] overflow-y-auto z-50" 
+                              sideOffset={5}
+                              align="start"
+                              avoidCollisions={true}
+                            >
                               <SelectGroup>
                                 <SelectItem value="small">$1,000 - $5,000</SelectItem>
                                 <SelectItem value="medium">$5,000 - $10,000</SelectItem>

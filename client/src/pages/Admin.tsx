@@ -113,7 +113,7 @@ const Admin: React.FC = () => {
       description: "",
       category: "",
       imageUrl: "",
-      tags: "",
+      tags: [],
       liveUrl: "",
       codeUrl: "",
     },
@@ -251,7 +251,7 @@ const Admin: React.FC = () => {
       description: project.description,
       category: project.category,
       imageUrl: project.imageUrl,
-      tags: Array.isArray(project.tags) ? project.tags.join(', ') : '',
+      tags: project.tags,
       liveUrl: project.liveUrl || '',
       codeUrl: project.codeUrl || '',
     });
