@@ -442,7 +442,7 @@ const Admin: React.FC = () => {
                                   <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent position="popper" className="min-w-[200px]" sideOffset={5}>
                                 <SelectItem value="web">Web Development</SelectItem>
                                 <SelectItem value="app">Mobile App</SelectItem>
                                 <SelectItem value="graphic">Graphic Design</SelectItem>
