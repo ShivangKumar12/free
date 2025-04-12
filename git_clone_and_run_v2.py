@@ -509,8 +509,8 @@ def main():
     debug_mode = "--debug" in sys.argv
     run_tests = "--test" in sys.argv
     
-    # Define the repository URL - using our local sample repository with dependencies
-    repo_url = "/home/runner/workspace/sample_repo_v2"
+    # Define the repository URL - using a public GitHub repository with dependencies
+    repo_url = "https://github.com/github/gitignore.git"
     
     # Check if git is installed
     if not check_git_installed(debug=debug_mode):
