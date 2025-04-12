@@ -15,6 +15,14 @@ import { z } from 'zod';
 import { getAuth, signInWithEmailAndPassword, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { Project, Review } from '@/types/schema';
 
+// Define Social Links Schema
+const SocialLinksSchema = z.object({
+  github: z.string().url({ message: "Please enter a valid GitHub URL" }).or(z.string().length(0)),
+  linkedin: z.string().url({ message: "Please enter a valid LinkedIn URL" }).or(z.string().length(0)),
+  facebook: z.string().url({ message: "Please enter a valid Facebook URL" }).or(z.string().length(0)),
+  instagram: z.string().url({ message: "Please enter a valid Instagram URL" }).or(z.string().length(0)),
+});
+
 const LoginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" })
@@ -99,6 +107,17 @@ const Admin: React.FC = () => {
     },
   });
   
+  // Social Links Form
+  const socialLinksForm = useForm<z.infer<typeof SocialLinksSchema>>({
+    resolver: zodResolver(SocialLinksSchema),
+    defaultValues: {
+      github: "https://github.com/ShivangKumar12",
+      linkedin: "https://www.linkedin.com/in/shivang-kumar98/",
+      facebook: "https://www.facebook.com/shivangsharma9852",
+      instagram: "https://www.instagram.com/shivang__18.12",
+    },
+  });
+  
   const handleLogin = async (values: z.infer<typeof LoginSchema>) => {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
@@ -179,6 +198,32 @@ const Admin: React.FC = () => {
       description: "Your contact information has been updated successfully.",
       variant: "default",
     });
+  };
+  
+  // Social Links Update Handler
+  const socialLinksMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof SocialLinksSchema>) => {
+      const response = await apiRequest('POST', '/api/social-links', data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Social Links Updated",
+        description: "Your social media links have been updated successfully.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update social media links.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleSocialLinksUpdate = (data: z.infer<typeof SocialLinksSchema>) => {
+    socialLinksMutation.mutate(data);
   };
   
   // Project Form
@@ -803,6 +848,98 @@ const Admin: React.FC = () => {
           {/* Settings Tab */}
           <TabsContent value="settings">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
+                <CardHeader>
+                  <CardTitle>Social Media Links</CardTitle>
+                  <CardDescription>Update your social media profiles displayed on the website.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...socialLinksForm}>
+                    <form onSubmit={socialLinksForm.handleSubmit(handleSocialLinksUpdate)} className="space-y-4">
+                      <FormField
+                        control={socialLinksForm.control}
+                        name="linkedin"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>LinkedIn</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://www.linkedin.com/in/yourprofile" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={socialLinksForm.control}
+                        name="github"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>GitHub</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://github.com/yourusername" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={socialLinksForm.control}
+                        name="instagram"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Instagram</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://www.instagram.com/yourusername" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={socialLinksForm.control}
+                        name="facebook"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Facebook</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="https://www.facebook.com/yourusername" 
+                                {...field}
+                                className="bg-background/70 border border-primary/20"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full"
+                        disabled={socialLinksMutation.isPending}
+                      >
+                        {socialLinksMutation.isPending ? "Updating..." : "Update Social Links"}
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+              
               <Card className="bg-background/50 backdrop-blur-sm border border-primary/10">
                 <CardHeader>
                   <CardTitle>Contact Information</CardTitle>
