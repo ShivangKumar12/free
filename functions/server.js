@@ -1,6 +1,7 @@
 import express from 'express';
 import serverless from 'serverless-http';
 import { MemStorage } from '../server/storage.js';
+const storage = require('./storage');
 
 // Initialize memory storage
 const storage = new MemStorage();
