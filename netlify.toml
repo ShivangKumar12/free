@@ -11,7 +11,7 @@
 # Proxy API requests to serverless function
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/server"
+  to = "/.functions/server"
   status = 200
   force = true
 
@@ -20,6 +20,10 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+  [functions]
+  directory = "functions"
+
 
 # Cache static assets with proper headers
 [[headers]]
