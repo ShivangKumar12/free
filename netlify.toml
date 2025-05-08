@@ -11,7 +11,7 @@
 # Proxy API requests to serverless function
 [[redirects]]
   from = "/api/*"
-  to = "/.functions/server"
+  to = "/.netlify/functions/server"
   status = 200
   force = true
 
@@ -21,9 +21,8 @@
   to = "/index.html"
   status = 200
 
-  [functions]
+[functions]
   directory = "functions"
-
 
 # Cache static assets with proper headers
 [[headers]]
@@ -39,4 +38,4 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' *.firebaseio.com firestore.googleapis.com identitytoolkit.googleapis.com; font-src 'self' data:;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' *.firebaseio.com firestore.googleapis.com identitytoolkit.googleapis.com; font-src 'self' data:"
