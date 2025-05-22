@@ -1,22 +1,37 @@
-# 🚀 iamshivang — Full Stack Personal Portfolio
+<p align="center">
+  <img src="public/logo.png" alt="iamshivang Logo" width="160" />
+</p>
 
-Welcome to **iamshivang**, a modern, full-stack developer portfolio showcasing my projects, skills, and experience. Built with cutting-edge technologies like TypeScript, Vite, Drizzle ORM, and Tailwind CSS, this project serves as both a resume and a playground for experimenting with new tools and techniques.
+<h1 align="center">🚀 iamshivang — Full Stack Personal Portfolio</h1>
 
-![Preview](public/preview.png)
-
-![Demo GIF](public/demo.gif)
+<p align="center">
+  <i>A blazing-fast modern developer portfolio, built with Vite, TypeScript, Drizzle ORM & Tailwind CSS.</i>
+</p>
 
 <p align="center">
   <a href="https://github.com/ShivangKumar12/iamshivang/stargazers">
-    <img src="https://img.shields.io/github/stars/ShivangKumar12/iamshivang?style=social" alt="Stars">
+    <img src="https://img.shields.io/github/stars/ShivangKumar12/iamshivang?style=social" />
   </a>
   <a href="https://github.com/ShivangKumar12/iamshivang/network/members">
-    <img src="https://img.shields.io/github/forks/ShivangKumar12/iamshivang?style=social" alt="Forks">
+    <img src="https://img.shields.io/github/forks/ShivangKumar12/iamshivang?style=social" />
   </a>
   <a href="https://iamshivang.netlify.app/">
-    <img src="https://img.shields.io/website?url=https%3A%2F%2Fiamshivang.netlify.app" alt="Live Demo">
+    <img src="https://img.shields.io/website?url=https%3A%2F%2Fiamshivang.netlify.app" />
   </a>
 </p>
+
+<p align="center">
+  <a href="https://github.com/ShivangKumar12"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" /></a>
+  <a href="https://linkedin.com/in/iamshivang"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="mailto:shivangkumar.tech@gmail.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+</p>
+
+---
+
+## 🎬 Preview
+
+![Preview Screenshot](public/preview.png)
+![Live Demo](public/demo.gif)
 
 ---
 
@@ -25,14 +40,14 @@ Welcome to **iamshivang**, a modern, full-stack developer portfolio showcasing m
 - ⚡ Blazing fast Vite-powered frontend
 - 🎨 Fully responsive and accessible UI with Tailwind CSS
 - 💼 Dynamic project & skill management system
-- 🔐 Backend with secure API routes (Node.js + TypeScript)
-- 🧠 Type-safe ORM integration with Drizzle
-- 🚀 Deploy-ready with Netlify support
-- 🔁 Shared code between client and server for consistency
+- 🔐 Secure backend APIs (Node.js + TypeScript)
+- 🧠 Type-safe ORM with Drizzle + PostgreSQL
+- 🚀 Netlify deployment-ready
+- 🔁 Shared client/server types for consistency
 
 ---
 
-## 📁 Project Structure
+## 🗂️ Project Structure
 
 ```
 .
@@ -51,7 +66,7 @@ Welcome to **iamshivang**, a modern, full-stack developer portfolio showcasing m
 
 | Layer         | Technology                     |
 |---------------|--------------------------------|
-| Frontend      | TypeScript, Vite, Tailwind CSS |
+| Frontend      | TypeScript, React, Vite        |
 | Backend       | Node.js, TypeScript            |
 | ORM/Database  | Drizzle ORM, PostgreSQL        |
 | Styling       | Tailwind CSS, PostCSS          |
@@ -72,7 +87,6 @@ cd iamshivang
 ### 2. Install Dependencies
 
 ```bash
-# For both frontend and backend
 npm install
 ```
 
@@ -91,71 +105,76 @@ DATABASE_URL=your_postgres_connection_string
 npm run dev
 ```
 
-Then visit: [http://localhost:3000](http://localhost:3000)
+Visit [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📦 Deployment
+## 📦 Deployment (Netlify)
 
-This project is configured for deployment with **Netlify**.
+This project is configured for deployment on **Netlify**.
 
-### Steps to deploy:
+### Steps:
 
 1. Push the repo to GitHub  
 2. Connect the repo on [Netlify](https://netlify.com)  
-3. Add environment variables in Netlify's UI  
-4. Trigger a build and deploy 🚀  
+3. Add required environment variables  
+4. Trigger a build and deploy 🚀
 
 ---
 
 ## 🧪 Testing (Coming Soon)
 
-Planned integration with:
-
-- ✅ Unit testing using **Jest**
+- ✅ Unit tests with **Jest**
 - 🚀 End-to-end testing with **Cypress** or **Playwright**
 
 ---
 
-## 👤 Author
+## 👨‍💻 About Me
 
 **Shivang Kumar**  
-📍 2nd Year B.Tech CSE Student, Chandigarh Engineering College  
-🔗 [LinkedIn](https://www.linkedin.com/in/iamshivang) • [GitHub](https://github.com/ShivangKumar12)
+🎓 2nd Year B.Tech CSE Student, Chandigarh Engineering College  
+💼 Passionate about full-stack dev, web security & open source
+
+📫 Connect with me:
+
+- [GitHub](https://github.com/ShivangKumar12)
+- [LinkedIn](https://linkedin.com/in/iamshivang)
+- 📧 [shivangkumar.tech@gmail.com](mailto:shivangkumar.tech@gmail.com)
 
 ---
 
 ## 🤝 Contributing
 
-Pull requests are welcome. For major changes, please open an issue first.
-
-### How to contribute:
+Pull requests are welcome! For major changes, open an issue first to discuss the proposal.
 
 ```bash
-# 1. Fork the repository
+# Fork the repo
 
-# 2. Create a feature branch
+# Create a new branch
 git checkout -b feature/YourFeature
 
-# 3. Commit your changes
-git commit -m "Add your feature"
+# Make your changes
+git commit -m "Add YourFeature"
 
-# 4. Push to GitHub
+# Push to your fork
 git push origin feature/YourFeature
 
-# 5. Create a Pull Request
+# Open a Pull Request 🎉
 ```
 
 ---
 
-## 📄 License
+## 🪪 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📣 Feedback
+## 💬 Feedback
 
-If you find a bug or want to suggest a feature, feel free to [open an issue](https://github.com/ShivangKumar12/iamshivang/issues) or connect with me directly!
+If you find a bug or have a feature request, feel free to [open an issue](https://github.com/ShivangKumar12/iamshivang/issues) or reach out to me directly.
 
-> ⭐ Don’t forget to star the repo if you like it!
+---
+
+⭐ **If you like this project, give it a star!**  
