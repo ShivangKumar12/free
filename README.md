@@ -30,7 +30,7 @@
 
 ## 🎬 Preview
 
-![Preview Screenshot](public/preview.png)
+![Preview Screenshot](preview.png)
 ![Live Demo](public/demo.gif)
 
 ---
